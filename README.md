@@ -1,2 +1,4 @@
-# data-analysis-py
-A repo for Python for Data Analysis, 3E textbook
+# Notes:
+
+Shortcut to remember: 
+* Ctrl + Space: Shows the suggestions drop down menu
