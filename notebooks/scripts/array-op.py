@@ -1,5 +1,6 @@
 # %% [markdown]
 # # Array-Oriented Programming
+
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
@@ -128,6 +129,30 @@ matrix_cum.cumsum(axis=0)
 # %%
 # Compute mean for values in different columns [-]
 matrix_cum.cumsum(axis=1)
+
+# %% [markdown]
+# ### Methods for Boolean Arrays
+
+# %%
+# True: 1, False: 0
+bool_arr = np.random.standard_normal(100)
+
+print("No. of False values:", (bool_arr <= 0).sum())
+print("No. of True values:", (bool_arr > 0).sum())
+
+# %%
+bools = np.array([True, False, False])
+
+# %%
+# Any value True?
+bools.any()
+
+# %%
+# All values True?
+bools.all()
+
+# %% [markdown]
+# These methods also work with non-boolean arrays, where non-zero elements are treated as `True`.
 
 # %%
 
