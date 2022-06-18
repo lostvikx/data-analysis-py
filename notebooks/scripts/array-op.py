@@ -154,5 +154,58 @@ bools.all()
 # %% [markdown]
 # These methods also work with non-boolean arrays, where non-zero elements are treated as `True`.
 
-# %%
+# %% [markdown]
+### Sorting
 
+# %%
+unsorted_arr = np.random.standard_normal(5)
+unsorted_arr2 = np.random.standard_normal(5)
+
+print(unsorted_arr)
+
+# %% [markdown]
+# **Note**: `sort` is an in-place sort, while using `np.sort` will return an array.
+
+# %%
+unsorted_arr.sort()
+unsorted_arr
+
+# %%
+sorted_arr = np.sort(unsorted_arr2)
+print(unsorted_arr2)
+print(sorted_arr)
+
+# %% [markdown]
+### Unique & Other Set Logic
+
+# %%
+letters = np.array(["a", "a", "b", "c", "b", "z"])
+np.unique(letters)
+
+# %%
+uni_nums = np.array([1, 2, 3, 4, 1, 2, 4, 2, 5])
+np.unique(uni_nums)
+
+# %% [markdown]
+# Note: `np.unique` is a top-level method, also it's similar to:
+
+# %%
+sorted(set(letters))
+
+# %% [markdown]
+# To test whether an element is in another array:
+
+# %%
+np.in1d(letters, np.array(["a", "b", "x"]))
+
+# %% [markdown]
+# Other set related methods are also built-in:
+
+# %%
+np.intersect1d(uni_nums, [1, 4, 6])
+
+# %%
+np.setxor1d(letters, ["a", "c", "x"])
+
+# %%
+np.union1d(letters, ["v", "x"])
