@@ -110,7 +110,37 @@ df.columns
 df["pop"]
 
 # %%
-df["debt"] = (np.abs(np.random.standard_normal(len(df))) * 500).round(0).astype(np.int16)
+df["debt"] = (np.abs(np.random.standard_normal(len(df))) * 500).round(0).astype(np.uint64)
+
+# %%
+df["is_eastern"] = df["state"] == "Ohio"
+
+# %%
+# Delete col:
+del df["is_eastern"]
+df.columns
+
+# %%
+p_data = {"Utah": {2000: 2.5, 2001: 1.1, 2002: 3.2}, "California": {2001: 3.7, 2002: 4.2}}
+
+frame = pd.DataFrame(p_data)
+
+# %%
+frame.T  # Transpose
+
+# %%
+# DataFrame doesn't have the name attribute.
+frame.index.name = "year"
+frame.columns.name = "state"
+
+# %% [markdown]
+# We can convert a DataFrame to ndarray:
+
+# %%
+frame.to_numpy()
+
+#%% [markdown]
+# ### Index Object
 
 # %%
 
