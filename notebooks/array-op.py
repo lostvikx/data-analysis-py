@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 
 #%%
 test_mesh = np.arange(0,5)
-# Both xs and ys are (1000, 1000) 2D matrices
 xs, ys = np.meshgrid(test_mesh, test_mesh)
 
 # %% [markdown]
@@ -23,6 +22,7 @@ plt.show()
 # %%
 # 1000 equally-spaced points
 points = np.arange(-5,5,0.01)
+# Both xs and ys are (1000, 1000) 2D matrices
 x, y = np.meshgrid(points, points)
 # %%
 z = np.sqrt(x**2 + y**2)
