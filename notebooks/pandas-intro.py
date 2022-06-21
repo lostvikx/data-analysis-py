@@ -143,4 +143,64 @@ frame.to_numpy()
 # ### Index Object
 
 # %%
+index_obj = pd.DataFrame(np.arange(3), index=["a", "b", "c"], columns=["test"])
+
+#%% [markdown]
+# Both the index and columns are instances of Index Object
+
+# %%
+index_obj.index
+
+# %%
+index_obj.columns
+
+# %% [markdown]
+# Index objects are immutable and thus can’t be modified by the user:
+
+# %%
+try:
+  index_obj.index[0] = "z"
+except Exception as e:
+  print(e)
+
+# %% [markdown]
+# ### Reindexing
+
+# %%
+re_obj = pd.Series(np.random.standard_normal(3), index=("a", "b", "c"))
+
+# %%
+re_obj.reindex(["c", "a", "d"])
+
+# %%
+colors = pd.Series(np.random.standard_normal(3), index=(0,2,3))
+
+# %%
+colors.reindex(np.arange(6), method="ffill")
+
+# %%
+df_count = pd.DataFrame(np.random.standard_normal((3,3)), index=("a", "b", "c"), columns=("Goa", "Kerla", "Delhi"))
+df_count = df_count * 50
+cool_index = pd.Index(("b", "d", "a", "c"))
+
+df_count.reindex(index=cool_index)
+#OR
+df_count.reindex(cool_index, axis="index")
+
+# %%
+cool_states = pd.Index(["Goa", "Assam", "Kerla"])
+
+df_count.reindex(columns=cool_states)
+# OR
+# { "index": 0, "columns": 1 }
+df_count.reindex(cool_states, axis=1)
+
+# %% [markdown]
+# **Note**: In the above examples, we used the `reindex` method to slice & insert either axes. If we only want to slice the `df` then we can use `loc` operator.
+
+# %%
+# This makes slicing super easy!
+df_count.loc[["a", "b"], ["Goa", "Kerla"]]
+
+# %%
 
