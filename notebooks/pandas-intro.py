@@ -368,4 +368,93 @@ dt.iat[2, 2]
 # **Note**: To avoid ambiguity in code, always use the `loc` & `iloc` operators.
 
 # %% [markdown]
+# ### Pitfalls with chaining indexing
+
+# %%
+dt.loc[:, "one"] = 1
+
+# %%
+dt.iloc[2] = 3
+
+# %%
+# Bad Practice:
+# dt.loc[dt["three"] < 5]["three"] = 5
+# Good Practice:
+dt.loc[dt["three"] < 5, "three"] = 5
+
+# %% [markdown]
+# Arithmetic Alignment
+
+# %%
+s1 = pd.Series(
+  np.random.standard_normal(3).round(1)*8,
+  index=list("acd")
+)
+s2 = pd.Series(
+  np.random.standard_normal(4).round(1)*8,
+  index=list("abcd")
+)
+
+# %%
+s1+s2
+
+# %% [markdown]
+# The internal data alignment introduces missing values in the label locations that don’t overlap.
+
+# %%
+df1 = pd.DataFrame(
+  (np.random.random((4,3)) * 10).round(1),
+  columns=list("abc"),
+  index=["Joe", "Mary", "Carl", "Vik"]
+)
+df2 = pd.DataFrame(
+  (np.random.random((3,3)) * 10).round(1),
+  columns=list("acd"),
+  index=["Joe", "Noah", "Mary"]
+)
+
+# %%
+df1+df2
+
+# %% [markdown]
+# Since column `"b"`` and `"d"`` don't appear in both DataFrame objects, all their results become `nan`. The same holds true for `Carl`, `Noah`, & `Vik`.
+
+# %%
+def rand_df(shape, columns, round=1):
+  return pd.DataFrame(
+    (np.random.random(shape) * 10).round(round),
+    columns=columns,
+  )
+
+# %%
+df_1 = rand_df((3,4), list("abcd"))
+
+# %%
+df_2 = rand_df((4,5), list("abcde"))
+
+# %%
+df_1+df_2
+
+# %%
+df_1.add(df_2, fill_value=0)
+
+# %% [markdown]
+# The `add` method is one of the several arithmentic operations available in the pandas library.
+#
+# In simple words, it adds two `DataFrame` objects together, similar to the simple `+` operator. 
+#
+# The `fill_value` parameter is important: by default is None, optionally takes a float value. Fill the existing missing (NaN) values, and any new element needed for successful DataFrame alignment.
+
+# %%
+# fill_value=1, 1 * num == num
+df_1.mul(df_2, fill_value=1)
+
+# %%
+a = np.arange(12.0).reshape((3, 4))
+a[0]
+
+# %%
+a - a[0]
+
+# %%
 
