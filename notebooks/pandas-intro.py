@@ -428,9 +428,11 @@ def rand_df(shape, columns, round=1):
 
 # %%
 df_1 = rand_df((3,4), list("abcd"))
+df_1
 
 # %%
 df_2 = rand_df((4,5), list("abcde"))
+df_2
 
 # %%
 df_1+df_2
@@ -455,6 +457,92 @@ a[0]
 
 # %%
 a - a[0]
+# The substraction is performed on all the rows, this is called as broadcasting.
+
+# %%
+dt_frame = pd.DataFrame(
+  np.arange(12.).reshape((3,4)), columns=list("abcd"),index=cool_states
+)
+dt_frame
+
+# %%
+ser1 = dt_frame.iloc[0]
+ser1
+
+# %%
+dt_frame - ser1
+
+# %%
+dt_frame
+
+# %%
+ser2 = dt_frame["a"]
+dt_frame.sub(ser2, axis=0)
+
+# %%
+ser3 = pd.Series(np.array([4, 2, 3, 5]), index=list("abcd"))
+dt_frame.mul(ser3, axis=1)
+
+# %%
+df_3 = pd.DataFrame((np.random.standard_normal((4, 3)) * 5).round(2),columns=list("bde"),index=["Utah", "Ohio", "Texas", "Oregon"])
+df_3
+
+# %%
+df_3.apply(np.std, axis=1)
+
+# %%
+df_3.std(axis=1)
+
+# %% [markdown]
+# NumPy uses `ddof=0`
+
+# %% [markdown]
+# ### Function Application & Mapping
+#
+# We can use the `apply` method to apply a custom or pre-built funcion. Most common mathematical functions are built-in, so the use of this is rare.
+
+# %%
+def minmax_diff(x):
+  """
+  A custom function
+
+  Args:
+    x: Series
+  Returns: Difference of max & min element
+  """
+  return x.max() - x.min()
+
+# %%
+df_3.apply(minmax_diff)
+
+# %%
+df_3.apply(minmax_diff, axis=1)
+
+# %%
+# We can even pass the function as a lambda fn:
+df_3.apply(lambda x: x.max() - x.min())
+
+# %%
+def both_minmax(x):
+  return pd.Series([x.min(), x.max()], index=("min", "max"))
+
+# %%
+df_3.apply(both_minmax)
+
+# %%
+df_3.apply(both_minmax, axis=1)
+
+# %% [markdown]
+# For an element-wise fn, use `applymap` function.
+
+# %%
+df_3.applymap(lambda x: f"{x:.1f}")
+
+# %% [markdown]
+# `map` is a array/Series method which iterates over the elements & applies the fn
+
+# %%
+df_3["e"].map(lambda x: int(x))
 
 # %%
 
