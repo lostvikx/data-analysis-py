@@ -203,4 +203,60 @@ df_count.reindex(cool_states, axis=1)
 df_count.loc[["a", "b"], ["Goa", "Kerla"]]
 
 # %%
+df_count.drop("c")
+
+# %%
+df_count.drop(["c", "a"])
+
+# %%
+df_count.drop(["Goa", "Delhi"], axis=1)
+
+# %% [markdown]
+# ### Indexing, Selection, & Filtering
+
+# %%
+# Series indexing works similar to NumPy indexing:
+ser1 = pd.Series(np.arange(4), index=["a", "b", "c", "d"])
+
+# %%
+ser1["b"] == ser1[1]
+
+# %%
+ser1[:-1]
+
+# %%
+ser1[["a", "c"]]
+
+# %%
+ser1[ser1 > 1]
+
+# %% [markdown]
+# **Note**: While we can select data in this manner, the `loc` operator is preferred.
+
+# %%
+ser1.loc[["a", "d"]]
+
+# %%
+ser1.loc[ser1 > 2]
+
+# %%
+test_ser1 = pd.Series(np.arange(3), index=[1, 2, 0])
+test_ser2 = pd.Series(np.arange(3), index=["m", "a", "d"])
+
+test_ser1[[0, 2]]
+
+# %%
+test_ser2[[0, 2]]
+
+# %%
+test_ser1.loc[[0, 1]]
+
+# %%
+# The loc operator works exclusively with labels, as opposed to the integers:
+try:
+  test_ser2.loc[[0, 1]]
+except Exception as e:
+  print(e)
+
+# %%
 
