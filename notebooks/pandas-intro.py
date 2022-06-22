@@ -88,9 +88,19 @@ test_obj.index = ["Rick", "Bilbo", "Thorin", "Elrond"]
 # ### DataFrame
 
 # %%
-data_set = {"state": ["Utah", "California", "Ohio", "California", "Utah", "Ohio"], "year": [2000, 2001, 2002, 2001, 2002, 2003], "pop": [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+data_set = {
+  "state": [
+    "Utah", "California", "Ohio", "California", "Utah", "Ohio"
+  ], 
+  "year": [2000, 2001, 2002, 2001, 2002, 2003], 
+  "pop": [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]
+}
+
 # Columns param rearranges the cols
-df = pd.DataFrame(data_set, columns=("year", "state", "pop", "debt"))
+df = pd.DataFrame(
+  data_set, 
+  columns=("year", "state", "pop", "debt")
+)
 
 # %%
 # First 5 records
@@ -256,7 +266,106 @@ test_ser1.loc[[0, 1]]
 try:
   test_ser2.loc[[0, 1]]
 except Exception as e:
+  print(test_ser2.iloc[[0, 1]])
+
+# %% [markdown]
+# When slicing using loc, the last value is inclusive.
+
+# %%
+ser1.loc["a": "c"]
+
+# %%
+ser1.loc["a": "b"] = 5
+
+# %%
+dt = pd.DataFrame(
+  np.arange(16).reshape((4,4)), 
+  index=["one", "two", "three", "four"], 
+  columns=[
+    "New York", "San Francisco", "Fargo", "Los Angeles"
+  ]
+).T
+
+# %%
+dt["two"]
+
+# %%
+dt.loc["Fargo"]
+
+# %%
+dt.sum(axis=1)
+
+# %%
+dt[["three", "one"]].sum(axis=1)
+
+# %%
+dt.iloc[2:]
+# OR
+dt["Fargo":]
+
+# %% [markdown]
+# **Note**: DataFrame's default `[]` operator:
+# * When used for indexing accepts column names
+# * While slicing accepts index names or ints
+
+# %%
+dt[dt["two"] > 5]
+
+# %%
+dt[dt < 3] = np.nan
+
+# %%
+dt[dt.isna()] = dt.mean(axis=1).mean()
+
+# %%
+dt = dt.astype(np.int64)
+
+# %% [markdown]
+# USing `loc`:
+
+# %%
+# Returns a Series when only one index:
+dt.loc["New York", ["one", "four"]]
+
+# %%
+dt.loc[
+  ["Fargo", "Los Angeles"], 
+  ["one", "three"]
+]
+
+# %% [markdown]
+# Using `iloc`:
+
+# %%
+# Returns a Series when only one index:
+dt.iloc[2, [0, 1]]
+
+# %%
+dt.iloc[[1, 3], [2, 3, 0]]
+
+# %% [markdown]
+# Boolean arrays can be used in `loc`, but not in `iloc`
+
+# %%
+dt.loc[dt["two"] > 5]
+
+# %%
+try:
+  dt.iloc[dt["one"] > 5]
+except Exception as e:
   print(e)
 
 # %%
+dt.iloc[:, :2][dt["one"] < 5]
+
+# %%
+dt.at["Fargo", "three"]
+
+# %%
+dt.iat[2, 2]
+
+# %% [markdown]
+# **Note**: To avoid ambiguity in code, always use the `loc` & `iloc` operators.
+
+# %% [markdown]
 
