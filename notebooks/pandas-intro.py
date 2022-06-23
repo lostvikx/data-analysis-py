@@ -544,5 +544,75 @@ df_3.applymap(lambda x: f"{x:.1f}")
 # %%
 df_3["e"].map(lambda x: int(x))
 
-# %%
+# %% [markdown]
+# ### Sorting & Ranking
 
+# %%
+ser_s = pd.Series(np.random.standard_normal(4)*8, index=("d", "a", "c", "b"))
+ser_s
+
+# %%
+ser_s.sort_index()
+
+# %%
+# Decending order:
+ser_s.sort_index(ascending=False)
+
+# %%
+ser_s.sort_values()
+
+# %%
+df_s = pd.DataFrame(np.random.standard_normal((2,3)) * 8, index=["two", "one"], columns=list("cab"))
+df_s
+
+# %%
+df_s.sort_index(axis=1, ascending=False)
+
+# %%
+df_s.sort_index()
+
+# %%
+ser_s["c"] = np.nan
+ser_s
+
+# %%
+# na_position: {‘first’, ‘last’}, default ‘last’
+ser_s.sort_values(na_position="first")
+
+# %%
+df_s1 = pd.DataFrame({
+  "a": [0,1,5,0],
+  "b": [6,-3,0,4]
+})
+df_s1
+
+# %%
+df_s1.sort_values("a")
+
+# %%
+df_s1.sort_values(["a","b"])
+
+# %%
+ser_r = pd.Series([2, 4, -3, 4, 5, 2])
+
+# %%
+ser_r.rank()
+
+# %%
+# Same values get a average rank!
+# There are multiple different methods of assigning the ranks
+ser_r.rank(method="first")
+
+# %%
+ser_r.rank(method="dense")
+
+# %%
+df_r = pd.DataFrame({
+  "a": (np.random.standard_normal(4)*8).round(0),
+  "b": (np.random.standard_normal(4)*8).round(0),
+  "c": (np.random.standard_normal(4)*8).round(0),
+})
+df_r
+
+# %%
+df_r.rank(axis=1, method="min")
