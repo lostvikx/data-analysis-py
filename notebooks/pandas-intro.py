@@ -616,3 +616,27 @@ df_r
 
 # %%
 df_r.rank(axis=1, method="min")
+
+# %% [markdown]
+# ### Duplicate Labels
+
+# %%
+dup = pd.Series(np.arange(5), index=["a", "a", "b", "b", "c"])
+
+# %%
+dup.index.is_unique
+
+# %%
+dup["b"]
+
+# %%
+dup_df = pd.DataFrame(np.arange(15).reshape((5,3)), index=["a", "a", "b", "c", "b"])
+
+# %%
+dup_df = dup_df.sort_index()
+
+# %%
+dup_df.loc["a"]
+
+# %%
+dup_df.loc["c"]
