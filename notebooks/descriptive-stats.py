@@ -66,8 +66,8 @@ df.std()
 # ### Correlation & Covariance
 
 # %%
-price = pd.read_pickle("data/yahoo_price.pkl")
-vol = pd.read_pickle("data/yahoo_volume.pkl")
+price = pd.read_pickle("examples/yahoo_price.pkl")
+vol = pd.read_pickle("examples/yahoo_volume.pkl")
 
 # %%
 price.tail()
