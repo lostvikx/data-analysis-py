@@ -47,8 +47,7 @@ pd.read_csv("examples/ex3.txt", sep="\s+")
 
 # %% [markdown]
 # The `sep` argument can take a regular expression as well as a string.
-
-# %% [markdown]
+#
 # Because there is one fewer column name (first row) than the columns (all other rows), pandas infers the first column as the index.
 
 # %%
@@ -58,7 +57,7 @@ pd.read_csv("examples/ex4.csv", skiprows=[0,2,3])
 # Handling missing data while reading a file is important. By default, `pandas` parses blank space, or *sentinels* such as NA & NULL.
 
 # %%
-# !cat "data/examples/ex5.csv"
+# !cat "examples/ex5.csv"
 pd.read_csv("examples/ex5.csv")
 
 # %%
