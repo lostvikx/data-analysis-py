@@ -7,6 +7,7 @@
 # %%
 import pandas as pd
 import numpy as np
+import sys
 
 # %%
 ex1 = "examples/ex1.csv"
@@ -85,6 +86,70 @@ sentinels = {
   "message": ["foo"]
 }
 pd.read_csv("examples/ex5.csv", na_values=sentinels)
+
+# %% [markdown]
+# ### Reading text (CSV) files in chunks
+
+# %%
+# Read small piece of a large file:
+pd.options.display.max_rows = 10
+
+# %%
+pd.read_csv("examples/ex6.csv")
+
+# %% [markdown]
+# Read in chunks of X rows:
+
+# %%
+df6_chunker = pd.read_csv("examples/ex6.csv", chunksize=1000)
+key_fq = pd.Series([], dtype="int64") # used later
+type(df6_chunker)
+
+# %%
+for chunk in df6_chunker:
+  print(chunk)
+  break
+
+#%% [markdown]
+# Or open it as a handler, then iterate over the chunks:
+
+# %%
+with pd.read_csv("examples/ex6.csv", chunksize=1000) as reader:
+  for chunk in reader:
+    # # Check df
+    # print(chunk.head())
+    # break
+    # Adding series (+), fill_value: key_fq was a blank Series.
+    key_fq = key_fq.add(chunk["key"].value_counts(), fill_value=0)
+
+key_fq
+
+# %%
+with pd.read_csv("examples/ex6.csv", chunksize=1000) as reader:
+  print(reader.get_chunk())
+
+#%% [markdown]
+# ### Writing out text files
+
+# %%
+df5
+
+# %%
+df5.to_csv("examples/out.csv")
+
+# ! cat examples/out.csv
+
+# %%
+# Other delimiters & represent nan values as "NULL":
+df5.to_csv(sys.stdout, sep="|", na_rep="NULL")
+
+# %%
+# Can disable index & headers
+df5.to_csv(sys.stdout, index=False, header=False) # header = bool or list
+
+# %%
+# Only a subset of cols
+df5.to_csv(sys.stdout, index=False, columns=["a", "b", "c"])
 
 # %%
 
