@@ -19,7 +19,7 @@ for _ in range(n_steps):
   walk.append(pos)
 
 plt.plot(walk[:100])
-plt.title(f"Avg pos: {np.mean(walk)}")
+plt.title(f"Avg pos: {np.mean(walk)} | Fin pos: {walk[99]}")
 plt.show()
 
 # %%
@@ -29,7 +29,7 @@ steps = np.where(draws, 1, -1)
 np_walk = steps.cumsum()
 
 plt.plot(np_walk[:100])
-plt.title(f"Avg pos: {np.mean(np_walk)}")
+plt.title(f"Avg pos: {np.mean(np_walk)} | Fin pos: {walk[99]}")
 plt.show()
 
 # %%
