@@ -10,6 +10,7 @@ import numpy as np
 import sys
 import csv
 import json
+from lxml import objectify
 
 # %%
 ex1 = "examples/ex1.csv"
@@ -221,6 +222,65 @@ js
 js.to_json(sys.stdout)
 # Or, for array output:
 js.to_json(sys.stdout, orient="records")
+
+# %% [markdown]
+# ### HTML & XML: Web Scrapping
+
+# %%
+tables = pd.read_html("examples/fdic_failed_bank_list.html")
+failed_banks = tables[0]
+
+# %%
+failed_banks.head()
+
+# %% [markdown]
+# No. of bank failures by year:
+
+# %%
+closing_timestamps = pd.to_datetime(failed_banks["Closing Date"])
+closing_timestamps.dt.year.value_counts()
+
+# %%
+with open("datasets/mta_perf/Performance_MNR.xml") as f:
+  parsed = objectify.parse(f)
+
+# %%
+root = parsed.getroot()
+root
+
+# %%
+xml_data = []
+skip_fields = ("INDICATOR_SEQ", "PARENT_SEQ",
+               "DESIRED_CHANGE", "DECIMAL_PLACES")
+
+for el in root.INDICATOR:
+  el_data = {}
+  for child in el.getchildren():
+    if child.tag not in skip_fields:
+      # using .pyval instead of .text, because it type converts the values
+      el_data[child.tag] = child.pyval
+
+  if len(el_data) != 0:
+    xml_data.append(el_data)
+
+len(xml_data)
+
+# %%
+xml_df = pd.DataFrame(xml_data)
+xml_df.head()
+
+# %% [markdown]
+# The above data extraction can be done in a single line using `.read_xml` method in pandas:
+
+# %%
+xml_df2 = pd.read_xml("datasets/mta_perf/Performance_MNR.xml")
+
+include_fields = []
+for field in xml_df2.columns:
+  if field not in skip_fields:
+    include_fields.append(field)
+
+xml_df2.loc[:, include_fields].head()
 
 # %%
 
