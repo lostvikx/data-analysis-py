@@ -8,6 +8,7 @@
 import pandas as pd
 import numpy as np
 import sys
+import csv
 
 # %%
 ex1 = "examples/ex1.csv"
@@ -149,6 +150,42 @@ df5.to_csv(sys.stdout, index=False, header=False) # header = bool or list
 # %%
 # Only a subset of cols
 df5.to_csv(sys.stdout, index=False, columns=["a", "b", "c"])
+
+# %%
+# ! cat examples/ex7.csv
+
+# %%
+pd.read_csv("examples/ex7.csv")
+
+# %%
+with open("examples/ex7.csv") as f:
+  for line in csv.reader(f):
+    print(line)
+
+# %%
+with open("examples/ex7.csv") as f:
+  lines = list(csv.reader(f))
+  header, values = lines[0], lines[1:]
+  data_dict = {h: v for h, v in zip(header, zip(*values))}
+  print(data_dict)
+
+# %%
+class custom_dialect(csv.Dialect):
+  # refer the docs
+  delimiter = ";"
+  lineterminator = "\n"
+  quotechar = '"'
+  quoting = csv.QUOTE_MINIMAL
+
+# %% [markdown]
+# Now, we can write a csv file with a custom format, dialect:
+
+# %%
+with open("examples/custom_dialect_file.csv", "w") as file:
+  writer = csv.writer(file, dialect=custom_dialect)
+  writer.writerow(("one", "two", "three"))
+  writer.writerow(tuple("123"))
+  writer.writerow(tuple("456"))
 
 # %%
 
