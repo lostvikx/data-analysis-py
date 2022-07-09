@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import sys
 import csv
+import json
 
 # %%
 ex1 = "examples/ex1.csv"
@@ -186,6 +187,40 @@ with open("examples/custom_dialect_file.csv", "w") as file:
   writer.writerow(("one", "two", "three"))
   writer.writerow(tuple("123"))
   writer.writerow(tuple("456"))
+
+# %% [markdown]
+# ### JSON Files
+
+# %%
+obj_js = """
+{
+  "name": "Vikram Negi",
+  "cities_lived": ["Navi Mumbai", "Mumbai", "Dehradun"],
+  "pet": null,
+  "siblings": [
+    {"name": "Yogesh", "age": 16, "hobbies": ["gaming", "gym", "anime", "football"]},
+    {"name": "Varun", "age": 5, "hobbies": ["reading", "gaming", "cartoon"]}
+  ]
+}
+"""
+test_js = json.loads(obj_js)
+test_js
+
+# %%
+sibs = pd.DataFrame(test_js["siblings"], columns=["name", "age"])
+sibs
+
+# %%
+# ! cat examples/example.json
+
+# %%
+js = pd.read_json("examples/example.json")
+js
+
+# %%
+js.to_json(sys.stdout)
+# Or, for array output:
+js.to_json(sys.stdout, orient="records")
 
 # %%
 
