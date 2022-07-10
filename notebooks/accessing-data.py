@@ -227,6 +227,7 @@ js.to_json(sys.stdout, orient="records")
 # ### HTML & XML: Web Scrapping
 
 # %%
+# Need to install lxml module
 tables = pd.read_html("examples/fdic_failed_bank_list.html")
 failed_banks = tables[0]
 
@@ -281,6 +282,97 @@ for field in xml_df2.columns:
     include_fields.append(field)
 
 xml_df2.loc[:, include_fields].head()
+
+# %% [markdown]
+# ### Binary Data Format
+
+# %%
+# Method 1: Pickle format
+df_1 = pd.read_csv("examples/ex1.csv")
+df_1
+
+# %%
+df_1.to_pickle("examples/ex_pickle")
+
+# %%
+pd.read_pickle("examples/ex_pickle")
+
+# %% [markdown]
+# `pickle` is only recommended as a short-term storage format, because it may not be supported in the future version of python.
+
+# %% [markdown]
+# ### Excel files
+
+# %%
+# Used when multiple sheets in an xlsx file
+xlsx = pd.ExcelFile("examples/ex1.xlsx")
+excel_sheet_name = xlsx.sheet_names[0]
+xlsx.parse(excel_sheet_name, index_col=0)
+
+# %%
+# OR simply use read_excel
+xl_frame = pd.read_excel("examples/ex1.xlsx", sheet_name=excel_sheet_name, index_col=0)
+
+# %% [markdown]
+# Similarly there are two ways to write data to an excel file:
+
+# %%
+xlsx_writer = pd.ExcelWriter("examples/ex2.xlsx")
+xl_frame.to_excel(xlsx_writer, "Sheet1")
+xlsx_writer.save()
+
+# %%
+pd.read_excel("examples/ex2.xlsx", sheet_name="Sheet1", index_col=0)
+
+# %% [markdown]
+# ### Hierarchial Data Format
+# 
+# First install `tables` package
+
+# %%
+test_df = pd.DataFrame(np.random.standard_normal((100,5))*5, columns=list("abcde"))
+test_df.head()
+
+# %%
+# Store class
+store = pd.HDFStore("examples/test.h5")
+store
+
+# %%
+store["test_1"] = test_df # store DataFrame
+store["col_a"] = test_df["a"] # store Series
+
+# %%
+store["test_1"].head()
+
+# %% [markdown]
+# `HDFStore` supports two storage schemas (format), "`fixed`" & "`table`"
+#
+# * Default is `fixed`
+# * `table` is slower, but supports query operations using special syntax
+
+# %%
+# put is the same as assigning store["key_name"] = df, but allows for defining
+# specific format
+store.put("test_2", test_df, format="table")
+
+# %%
+# Query it kinda like a database
+store.select("test_2", where=["index >= 10 and index < 15"])
+
+# %% [markdown]
+# Here is a simple way to do read & write HDF:
+
+# %%
+# Write operation
+test_df.to_hdf("examples/test2.h5", "test", format="table")
+
+# %%
+# Read operation
+pd.read_hdf("examples/test2.h5", "test", where=["index < 5"])
+
+# %% [markdown]
+# **Note**: `HDF5` isn't a database. It's best suited for write-once, read-many datasets.
 
 # %%
 
