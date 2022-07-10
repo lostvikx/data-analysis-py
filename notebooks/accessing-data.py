@@ -11,6 +11,8 @@ import sys
 import csv
 import json
 from lxml import objectify
+import requests
+import re
 
 # %%
 ex1 = "examples/ex1.csv"
@@ -373,6 +375,41 @@ pd.read_hdf("examples/test2.h5", "test", where=["index < 5"])
 
 # %% [markdown]
 # **Note**: `HDF5` isn't a database. It's best suited for write-once, read-many datasets.
+
+# %%
+reddit_tiktok_url = "https://www.reddit.com/r/TikTokCringe/top.json?limit=10"
+headers = {"user-agent": "Linux Machine (Vikram Singh Negi)"}
+
+res = requests.get(reddit_tiktok_url, headers=headers)
+try:
+  res.raise_for_status()
+  data = res.json()["data"]
+except Exception as err:
+  print(f"HTTP Error: {err}")
+
+# %%
+
+# pd.DataFrame([child["data"] for child in data["children"]])
+[child["data"] for child in data["children"]][0]
+
+# %%
+dt = []
+valid_fields = ["subreddit", "title", "thumbnail", "url_overridden_by_dest", "subreddit_id", "author", "url", "media", "is_video"]
+
+for child in data["children"]:
+  if child["data"]["is_video"]:
+    child_data = {}
+    for key, val in child["data"].items():
+      if key in valid_fields:
+        if key == "media":
+          fallback_url = val["reddit_video"]["fallback_url"]
+          child_data["video_url"] = fallback_url
+          child_data["audio_url"] = re.sub(r"[\w+\/]DASH_(\d+)", "/DASH_audio", fallback_url)
+        else:
+          child_data[key] = val
+    dt.append(child_data)
+
+pd.DataFrame(dt)
 
 # %%
 
