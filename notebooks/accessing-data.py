@@ -13,6 +13,8 @@ import json
 from lxml import objectify
 import requests
 import re
+import sqlite3
+import sqlalchemy as sqla
 
 # %%
 ex1 = "examples/ex1.csv"
@@ -63,7 +65,7 @@ pd.read_csv("examples/ex4.csv", skiprows=[0,2,3])
 # Handling missing data while reading a file is important. By default, `pandas` parses blank space, or *sentinels* such as NA & NULL.
 
 # %%
-# !cat "examples/ex5.csv"
+# ! cat "examples/ex5.csv"
 pd.read_csv("examples/ex5.csv")
 
 # %%
@@ -120,6 +122,7 @@ for chunk in df6_chunker:
 
 # %%
 with pd.read_csv("examples/ex6.csv", chunksize=1000) as reader:
+  # Read chuncksize rows at every iteration
   for chunk in reader:
     # # Check df
     # print(chunk.head())
@@ -131,6 +134,8 @@ key_fq
 
 # %%
 with pd.read_csv("examples/ex6.csv", chunksize=1000) as reader:
+  # Can iterate like: for chunk in reader.get_chunk()
+  # It's a generater function
   print(reader.get_chunk())
 
 #%% [markdown]
@@ -376,6 +381,9 @@ pd.read_hdf("examples/test2.h5", "test", where=["index < 5"])
 # %% [markdown]
 # **Note**: `HDF5` isn't a database. It's best suited for write-once, read-many datasets.
 
+# %% [markdown]
+# ### Interacting with Web APIs
+
 # %%
 reddit_tiktok_url = "https://www.reddit.com/r/TikTokCringe/top.json?limit=10"
 headers = {"user-agent": "Linux Machine (Vikram Singh Negi)"}
@@ -411,5 +419,54 @@ for child in data["children"]:
 
 pd.DataFrame(dt)
 
-# %%
+# %% [markdown]
+# ### Interacting with Databases
 
+# %%
+con = sqlite3.connect("examples/test.db")
+
+# %%
+create_table_query = """
+  CREATE TABLE us_cities (
+    city VARCHAR(20),
+    state VARCHAR(20),
+    population REAL,
+    rating INTEGER
+  )
+"""
+try:
+  con.execute(create_table_query)
+  con.commit()
+except Exception as err:
+  print("DB Error:", err)
+
+# %%
+db_data = [
+  ("Atlanta", "Georgia", 1.25, 6),
+  ("Tallahassee", "Florida", 2.6, 3),
+  ("Sacramento", "California", 1.7, 5)
+]
+
+con.executemany("INSERT INTO us_cities VALUES (?, ?, ?, ?)", db_data)
+con.commit()
+
+# %% [markdown]
+# Read from database:
+
+# %%
+cur = con.execute("SELECT * FROM us_cities")
+rows = cur.fetchall()
+rows
+
+# %%
+cur.description
+
+# %%
+pd.DataFrame(rows, columns=[name[0] for name in cur.description])
+
+# %% [markdown]
+# Using SQLAlchemy to make the above process simple:
+
+# %%
+db = sqla.create_engine("sqlite:///examples/test.db")
+pd.read_sql("SELECT * FROM us_cities", db)
