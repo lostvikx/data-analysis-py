@@ -111,4 +111,112 @@ df3.fillna(df3.mean(axis=0)).round(2)
 # ### Data Transformation
 
 # %%
+df4 = pd.DataFrame({"k1": ["one", "two"] * 3 + ["two"], "k2": [1,1,2,3,3,4,4]})
+df4
+
+# %%
+# True if record is a duplicate
+df4.duplicated()
+
+# %%
+df4.drop_duplicates()
+
+# %%
+df4["v1"] = np.arange(7)
+df4
+
+# %%
+df4.drop_duplicates(subset="k1")
+
+# %%
+df4.drop_duplicates(subset=["k1"], keep="last")
+
+# %%
+meat_df = pd.DataFrame({"food": ["bacon","pulled pork","bacon","pastrami","corned beef","bacon","pastrami","honey ham","nova lox"], "ounces": np.abs((np.random.standard_normal(9)*8).round(1))})
+meat_df
+
+# %% [markdown]
+# Let's say you want to map each meat with the animal it came from:
+
+# %%
+# Method #1:
+meat_to_ani = {
+  "bacon": "pig",
+  "pulled pork": "pig",
+  "pastrami": "cow",
+  "corned beef": "cow",
+  "honey ham": "pig",
+  "nova lox": "salmon"
+}
+
+meat_df["animal"] = meat_df["food"].map(meat_to_ani)
+meat_df
+
+# %%
+# Method #2
+meat_df["food"].map(lambda food: meat_to_ani[food])
+
+# %%
+def food_mapper(food):
+  animal_prods = {
+    "pig": ["bacon", "pulled pork", "honey ham"],
+    "cow": ["pastrami", "corned beef"],
+    "salmon": ["nova lox"]
+  }
+
+  for ani, foods in animal_prods.items():
+    if food in foods:
+      return ani
+
+# %%
+meat_df["food"].map(food_mapper)
+
+# %%
+s1 = pd.Series([12.1, 8, -999, -1000, 0.8, -999])
+s1
+
+# %%
+# Value -999 might be a sentinel:
+s1.replace(-999, np.nan)
+
+# %%
+s1.replace([-999,-1000], np.nan)
+
+# %%
+s1.replace([-999,-1000], [np.nan, 0.0])
+
+# %%
+# Can also provide a dictionary
+s1.replace({-999: np.nan, 1000: 0.0})
+
+# %% [markdown]
+# ### Renaming Axes
+
+# %%
+df5 = pd.DataFrame(
+  data=(np.random.standard_normal((3,4))*8).round(2),
+  columns=list("abcd"),
+  index=["Ohio", "Colorado", "New York"]
+)
+df5
+
+# %%
+df5.index = df5.index.map(lambda city: city[:4].upper().strip())
+df5
+
+# %%
+# If you don't want to mutate the original:
+df5.rename(mapper=lambda city: city.title(), axis=0)
+
+# %%
+# Change both index and column together
+df5.rename(
+  index=lambda i: i.title(),
+  columns=lambda c: c.upper()
+)
+
+# %%
+df5.rename(columns={"a": "foo", "c": "fizz"}, index={"NEW": "GOLD"}).rename(lambda i: i.title(), axis=0)
+
+# %%
 
