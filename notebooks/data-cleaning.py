@@ -218,5 +218,77 @@ df5.rename(
 # %%
 df5.rename(columns={"a": "foo", "c": "fizz"}, index={"NEW": "GOLD"}).rename(lambda i: i.title(), axis=0)
 
+# %% [markdown]
+# ### Discretization & Binning
+# 
+# Continuous data is often discretized or otherwise separated into 'bins' for analysis. Eg: [1.2, 3.2, 2.8] => (1, 4] -> range len: 3
+#
+# **Note**: Excludes lower and includes upper by default.
+
+# %%
+ages = [28, 20, 22, 25, 27, 21, 23, 37, 31, 61, 45, 41, 32, 67]
+bins = [18,25,35,60,100]
+
+age_cate = pd.cut(ages,bins)
+age_cate
+
+# %%
+type(age_cate)
+
+# %%
+age_cate.codes
+
+# %%
+age_cate.categories
+
+# %%
+# Frequencies of categorical data in a Series
+age_cate.value_counts()
+# OR
+pd.value_counts(age_cate)
+
+# %% [markdown]
+# **Note**: In the string representation of an interval, a parenthesis means that side is open (exclusive), while the square bracket means it's closed (inclusive).
+#
+# (18, 25] => 18 isn't included, but 25 is.
+
+# %%
+# Right side becomes exclusive:
+pd.cut(ages,bins,right=False) # [18, 25)...
+
+# %%
+age_group_names = ["Youth", "YoungAdult", "MiddleAged", "Senior"]
+
+age_cat = pd.cut(ages, bins, labels=age_group_names, right=False)
+age_cat
+
+# %%
+# Returns pd.Index
+age_cat.categories
+
+# %%
+uni = np.random.uniform(size=100)
+# Gives 4 equally ranage cuts:
+pd.cut(uni,4,precision=2).value_counts()
+# precision=2, limits the precision to 2 decimal places
+
+# %%
+# Using qcuts gives 4 equally allocated ranges:
+pd.qcut(np.random.standard_normal(1000),4,precision=2).value_counts()
+
+# %% [markdown]
+# **Note**: `.qcut` represents quartile cut
+#
+# Similar to `.cut`, we can pass custom quartiles from 0 to 1:
+
+# %%
+pd.qcut(np.random.standard_normal(1000), [0, 0.2, 0.5, 0.7, 1], precision=2).value_counts()
+
+# %% [markdown]
+# **Note**: These discretization functions are useful for quartile & group analysis.
+
+# %% [markdown]
+# ### Detecting & Filtering Outliers
+
 # %%
 
