@@ -291,4 +291,121 @@ pd.qcut(np.random.standard_normal(1000), [0, 0.2, 0.5, 0.7, 1], precision=2).val
 # ### Detecting & Filtering Outliers
 
 # %%
+df6 = pd.DataFrame(np.random.standard_normal((1000,4)))
+df6
+
+# %%
+df6.describe()
+
+# %% [markdown]
+# Find values in one of the columns exceeding 3 in absolute value:
+
+# %%
+col = df6[2]
+col[col.abs() > 3]
+
+# %% [markdown]
+# Select the entire row that satisfy the above condition:
+
+# %%
+df6[(df6.abs() > 3).any(axis=1)]
+# The conditional gives us a boolean df, then any returns True if any True found in a row (axis=1), the filter the data.
+
+# %%
+# Return rows where all elements, in that row, is greater than 1.1 in abs value:
+df6[(df6.abs() > 1.1).all(axis=1)]
+
+# %% [markdown]
+# Cap the values to -3 to +3
+
+# %%
+df7 = df6.copy()
+# np.sign => (-1 if x < 0), (0 if x == 0), (1 if x > 0)
+df7[df7.abs() > 3] = np.sign(df7) * 3
+
+# %%
+df7.describe()
+
+# %%
+np.sign(df7).head()
+
+# %% [markdown]
+# ### Permutation & Random Sampling
+
+# %%
+df8 = pd.DataFrame(np.arange(5*7).reshape((5,7)))
+df8
+
+# %%
+# Same as row length
+sim_sampler = np.random.permutation(5)
+sim_sampler
+
+# %%
+df8.take(sim_sampler)
+# OR
+df8.iloc[sim_sampler]
+
+# %%
+col_sampler = np.random.permutation(7)
+col_sampler
+
+# %%
+df8.take(col_sampler, axis=1)
+#OR
+df8[col_sampler]
+
+# %% [markdown]
+# Select random subset without replacement (no same rows):
+
+# %%
+df8.sample(n=3)
+
+# %%
+ser2 = pd.Series([1,0,-4,2,7])
+ser2
+
+# %% [markdown]
+# Random subset with replacement, pass replace=True:
+
+# %%
+ser2.sample(n=10, replace=True)
+
+# %% [markdown]
+# ### Dummy Variables
+
+# %%
+df9 = pd.DataFrame({"key": ["a", "c", "b", "b", "a", "a"], "data": np.random.standard_normal(6)})
+df9
+
+# %%
+pd.get_dummies(df9["key"])
+
+# %%
+dummies = pd.get_dummies(df9["key"], prefix="key_")
+# Cannot join with a Series
+df9[["data"]].join(dummies)
+
+# %%
+movies = pd.read_table("datasets/movielens/movies.dat", sep="::", engine="python", header=None, names=["movie_id", "title", "genre"])
+# !cat "datasets/movielens/movies.dat"
+movies.head()
+
+# %%
+mov_dummies = movies["genre"].str.get_dummies(sep="|")
+mov_dummies.iloc[:5, :4]
+
+# %%
+movies.join(mov_dummies.add_prefix("Genre_")).iloc[15]
+
+# %%
+vals = np.random.uniform(size=10)
+print(vals)
+test_bins = [0,0.2,0.4,0.6,0.8,1]
+# pd.cut(vals,test_bins)
+
+# %%
+pd.get_dummies(pd.cut(vals,test_bins))
+
+# %%
 
