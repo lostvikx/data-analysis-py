@@ -382,7 +382,7 @@ df9
 pd.get_dummies(df9["key"])
 
 # %%
-dummies = pd.get_dummies(df9["key"], prefix="key_")
+dummies = pd.get_dummies(df9["key"], prefix="key")
 # Cannot join with a Series
 df9[["data"]].join(dummies)
 
@@ -406,6 +406,66 @@ test_bins = [0,0.2,0.4,0.6,0.8,1]
 
 # %%
 pd.get_dummies(pd.cut(vals,test_bins))
+
+# %%
+df10 = pd.DataFrame({"flat": np.random.standard_normal(6).round(2), "sex": ["male", "male", "female", "male", "female", "female"]})
+df10
+
+# %%
+# df10["sex"].map({"female":0,"male":1})
+# OR
+pd.get_dummies(df10["sex"],prefix="sex").iloc[:, 1:]
+
+# %% [markdown]
+# **Note**: Generally, if you have k possible values for a categorical variable, in this case sex can be 2 possible values: male and female; we use k-1 dummy variables to represent it.
+
+# %%
+df11 = pd.concat([df9, df10], axis=1)
+df11
+
+# %%
+# If we pass the entire DataFrame
+# use drop_first to get that k-1 dummy variables
+pd.get_dummies(df11, columns=["key", "sex"], drop_first=True)
+
+# %%
+# ### Extensions Data Types
+
+# %%
+# nan is makes the entire Series dtype: float64 instead of int64
+# Mainly because of backward compatibility reasons
+pd.Series([1,2,3,np.nan])
+
+# %%
+# dtype=pd.Int64Dtype() or "Int64"
+s1 = pd.Series([1,2,3,None],dtype="Int64")
+s1
+
+# %%
+s1.dtype
+
+# %%
+s1[s1.notna()]
+
+# %%
+s1[3] is pd.NA
+
+# %%
+df12 = pd.DataFrame({
+  "a": [1,None,3,4],
+  "b": ["one", "two", None, "four"],
+  "c": [None, False, True, True]
+})
+df12
+
+# %%
+for t,col_name in zip(["Int64", "string", "boolean"], list("abc")):
+  df12[col_name] = df12[col_name].astype(t)
+
+df12
+
+# %%
+df12.info()
 
 # %%
 
