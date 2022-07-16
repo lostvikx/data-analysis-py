@@ -11,6 +11,7 @@
 # %%
 import pandas as pd
 import numpy as np
+import re
 
 # %%
 ser1 = pd.Series([1.2,4.1,None,3.8,np.nan])
@@ -466,6 +467,90 @@ df12
 
 # %%
 df12.info()
+
+# %% [markdown]
+# ### String Manipulation
+
+# %%
+a = "a,b,  vik"
+b = [s.strip() for s in a.split(",")]
+b
+
+# %%
+"::".join(b)
+
+# %%
+print(a.find(":")) # Returns -1 if not found
+print(a.index(",")) # Throws a ValueError
+
+# %%
+"vik" in a
+
+# %%
+# Counts the occurances of the substring
+a.count("z")
+
+# %%
+a.replace(",", "||")
+
+# %% [markdown]
+# ### RegEx
+
+# %%
+re.split(r"\s+", "foo    bar\t baz  \tqux")
+
+# %% [markdown]
+# Create a regex object to use the same expression to many strings:
+
+# %%
+text = """Dave dave@proton.me
+Vik vik.negi@gmail.com
+Rob rob@gmail.com
+Ryan ryan@yahoo.com"""
+
+regex = re.compile(r"[\w\.]+@\w+\.\w{2,4}")
+regex.findall(text)
+
+# %%
+print(regex.sub("exposed", text))
+
+# %%
+sep_reg = re.compile(r"([\w\.]+)@(\w+)\.(\w{2,4})")
+
+# %%
+m = sep_reg.match("vikram.s.negi@proton.me")
+m.groups()
+
+# %%
+sep_reg.findall(text)
+
+# %%
+print(sep_reg.sub(r"=> username: \1, domain: \2, suffix: \3", text))
+
+# %%
+mail_ser = pd.Series({"Vik": "vikram.s.negi@proton.me", "Yog": "yogesh@gmail.com", "Joe": "joe.cole@letme.in", "Wes": np.nan})
+mail_ser
+
+# %%
+mail_ser.isna()
+
+# %%
+mail_ser.str.contains("gmail")
+
+# %%
+matches = mail_ser.str.findall(r"([\w\.]+)@(\w+)\.(\w{2,4})").str[0]
+matches
+
+# %%
+matches.str.get(1)
+
+# %%
+mail_df = mail_ser.str.extract(r"([\w\.]+)@(\w+)\.(\w{2,4})")
+mail_df.columns = pd.Index(["username", "domain", "suffix"])
+mail_df.dropna()
+
+# %% [markdown]
+# ### Categorical Data
 
 # %%
 
