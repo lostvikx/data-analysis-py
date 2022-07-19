@@ -553,4 +553,53 @@ mail_df.dropna()
 # ### Categorical Data
 
 # %%
+# The array of distinct values can be called the categories, dictionary, or levels of the data.
+fruits = ["apple", "banana", "grapes"]
+ser3 = pd.Series(fruits*3)
+ser3
+
+# %%
+ser3.value_counts()
+
+# %%
+ser4 = pd.Series([0,1,2,1,0]*2)
+ser3.take(ser4)
+
+# %%
+fruits1 = fruits * 2
+n_fruits = len(fruits1)
+rng = np.random.default_rng(seed=12345)
+
+fruits_df = pd.DataFrame({
+  "basket_id": np.arange(n_fruits),
+  "fruit": fruits1,
+  "count": rng.integers(3,12,size=n_fruits),
+  "weight": rng.uniform(0,5,size=n_fruits).round(2)
+})
+fruits_df
+
+# %%
+fruit_cate = fruits_df["fruit"].astype("category").array
+fruit_cate
+
+# %%
+type(fruit_cate)
+
+# %%
+fruit_cate.categories
+
+# %%
+fruit_cate.codes
+
+# %%
+dict(enumerate(fruit_cate.categories))
+
+# %%
+cate1 = pd.Categorical(["doo", "bar", "zap", "doo", "zap"])
+cate1
+
+# %%
+pd.Categorical.from_codes([2,1,0,1,2],cate1.categories,ordered=True)
+
+# %%
 
