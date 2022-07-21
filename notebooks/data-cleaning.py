@@ -274,6 +274,9 @@ pd.cut(uni,4,precision=2).value_counts()
 # precision=2, limits the precision to 2 decimal places
 
 # %%
+pd.qcut(uni,4,precision=2).value_counts()
+
+# %%
 # Using qcuts gives 4 equally allocated ranges:
 pd.qcut(np.random.standard_normal(1000),4,precision=2).value_counts()
 
@@ -293,7 +296,7 @@ pd.qcut(np.random.standard_normal(1000), [0, 0.2, 0.5, 0.7, 1], precision=2).val
 
 # %%
 df6 = pd.DataFrame(np.random.standard_normal((1000,4)))
-df6
+df6.head()
 
 # %%
 df6.describe()
@@ -397,7 +400,11 @@ mov_dummies = movies["genre"].str.get_dummies(sep="|")
 mov_dummies.iloc[:5, :4]
 
 # %%
-movies.join(mov_dummies.add_prefix("Genre_")).iloc[15]
+movs_df = movies.join(mov_dummies.add_prefix("Genre_"))
+movs_df.head()
+
+# %%
+movs_df.drop("genre",axis=1).head()
 
 # %%
 vals = np.random.uniform(size=10)
@@ -415,18 +422,20 @@ df10
 # %%
 # df10["sex"].map({"female":0,"male":1})
 # OR
-pd.get_dummies(df10["sex"],prefix="sex").iloc[:, 1:]
+pd.get_dummies(df10["sex"],prefix="sex")
 
 # %% [markdown]
 # **Note**: Generally, if you have k possible values for a categorical variable, in this case sex can be 2 possible values: male and female; we use k-1 dummy variables to represent it.
+
+# %%
+pd.get_dummies(df10["sex"], prefix="sex").iloc[:, 1:]
 
 # %%
 df11 = pd.concat([df9, df10], axis=1)
 df11
 
 # %%
-# If we pass the entire DataFrame
-# use drop_first to get that k-1 dummy variables
+# If we pass the entire DataFrame, use drop_first to get that k-1 dummy variables
 pd.get_dummies(df11, columns=["key", "sex"], drop_first=True)
 
 # %%
@@ -503,19 +512,20 @@ re.split(r"\s+", "foo    bar\t baz  \tqux")
 # Create a regex object to use the same expression to many strings:
 
 # %%
-text = """Dave dave@proton.me
+text = """Bob bob25@proton.me
 Vik vik.negi@gmail.com
-Rob rob@gmail.com
-Ryan ryan@yahoo.com"""
+Robb robb-stark@winter.got
+Ryan ryan_reynolds@hollywood.la"""
 
-regex = re.compile(r"[\w\.]+@\w+\.\w{2,4}")
+regex = re.compile(r"[\w\.\-\_]+@\w+\.\w{2,4}")
 regex.findall(text)
 
 # %%
 print(regex.sub("exposed", text))
 
 # %%
-sep_reg = re.compile(r"([\w\.]+)@(\w+)\.(\w{2,4})")
+regex_str = r"([\w\.\-\_]+)@(\w+)\.(\w{2,4})"
+sep_reg = re.compile(regex_str)
 
 # %%
 m = sep_reg.match("vikram.s.negi@proton.me")
@@ -525,10 +535,16 @@ m.groups()
 sep_reg.findall(text)
 
 # %%
+# Why no zero count? We may never know!
 print(sep_reg.sub(r"=> username: \1, domain: \2, suffix: \3", text))
 
 # %%
-mail_ser = pd.Series({"Vik": "vikram.s.negi@proton.me", "Yog": "yogesh@gmail.com", "Joe": "joe.cole@letme.in", "Wes": np.nan})
+name_mail_dict = {name: mail_id for name, mail_id in [re.split(r"\s+", t) for t in text.split("\n")]}
+name_mail_dict
+
+# %%
+name_mail_dict["Wes"] = np.nan
+mail_ser = pd.Series(name_mail_dict)
 mail_ser
 
 # %%
@@ -538,14 +554,14 @@ mail_ser.isna()
 mail_ser.str.contains("gmail")
 
 # %%
-matches = mail_ser.str.findall(r"([\w\.]+)@(\w+)\.(\w{2,4})").str[0]
+matches = mail_ser.str.findall(regex_str).str[0]
 matches
 
 # %%
 matches.str.get(1)
 
 # %%
-mail_df = mail_ser.str.extract(r"([\w\.]+)@(\w+)\.(\w{2,4})")
+mail_df = mail_ser.str.extract(regex_str)
 mail_df.columns = pd.Index(["username", "domain", "suffix"])
 mail_df.dropna()
 
@@ -602,4 +618,57 @@ cate1
 pd.Categorical.from_codes([2,1,0,1,2],cate1.categories,ordered=True)
 
 # %%
+draws = rng.standard_normal(1000)
+bins1 = pd.qcut(draws,4,labels=[f"Q{i}" for i in range(1,5)])
 
+# %%
+bins1
+
+# %%
+bins1.codes[:5]
+
+# %%
+bins1 = pd.Series(bins1,name="quartile")
+df13 = pd.Series(draws).groupby(bins1).agg(["count","mean","max","min"]).reset_index()
+df13
+
+# %%
+df13["quartile"]
+
+# %%
+n = 10_000_000
+labels = pd.Series(["foo","bar","qux","gif"]*(n//4))
+lab_cate = labels.astype("category")
+lab_cate
+
+# %%
+labels.memory_usage(deep=True)
+
+# %%
+lab_cate.memory_usage(deep=True)
+
+# %%
+# %timeit labels.value_counts()
+
+# %%
+# %timeit lab_cate.value_counts()
+
+# %%
+cate_s1 = pd.Series(list("abcd")*2).astype("category")
+cate_s1
+
+# %%
+cate_s1.cat.set_categories(list("abcde")).value_counts()
+
+# %%
+cate_s2 = cate_s1[cate_s1.isin(list("ab"))]
+cate_s2
+
+# %%
+cate_s2.cat.remove_unused_categories()
+
+# %%
+cate_s3 = pd.Series(["dev","man","adn","fin"]*2,dtype="category")
+cate_s3
+# %%
+pd.get_dummies(cate_s3,prefix="jd").iloc[:, :-1]
