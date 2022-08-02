@@ -313,7 +313,7 @@ col[col.abs() > 3]
 
 # %%
 df6[(df6.abs() > 3).any(axis=1)]
-# The conditional gives us a boolean df, then any returns True if any True found in a row (axis=1), the filter the data.
+# The conditional gives us a boolean df, then any returns True if any True found in a row (axis=1), then filter the data.
 
 # %%
 # Return rows where all elements, in that row, is greater than 1.1 in abs value:
@@ -342,13 +342,13 @@ df8
 
 # %%
 # Same as row length
-sim_sampler = np.random.permutation(5)
-sim_sampler
+row_sampler = np.random.permutation(5)
+row_sampler
 
 # %%
-df8.take(sim_sampler)
+df8.take(row_sampler)
 # OR
-df8.iloc[sim_sampler]
+df8.iloc[row_sampler]
 
 # %%
 col_sampler = np.random.permutation(7)
@@ -358,6 +358,12 @@ col_sampler
 df8.take(col_sampler, axis=1)
 #OR
 df8[col_sampler]
+
+# %%
+# Mixing it up
+df8.take(row_sampler).take(col_sampler, axis=1)
+# OR
+df8.loc[row_sampler, col_sampler]
 
 # %% [markdown]
 # Select random subset without replacement (no same rows):
@@ -401,7 +407,7 @@ mov_dummies.iloc[:5, :4]
 
 # %%
 movs_df = movies.join(mov_dummies.add_prefix("Genre_"))
-movs_df.head()
+movs_df = movs_df.rename(mapper=lambda name: name.lower(), axis=1)
 
 # %%
 movs_df.drop("genre",axis=1).head()
@@ -428,7 +434,7 @@ pd.get_dummies(df10["sex"],prefix="sex")
 # **Note**: Generally, if you have k possible values for a categorical variable, in this case sex can be 2 possible values: male and female; we use k-1 dummy variables to represent it.
 
 # %%
-pd.get_dummies(df10["sex"], prefix="sex").iloc[:, 1:]
+df10[["flat"]].join(pd.get_dummies(df10["sex"], prefix="sex").iloc[:, 1:])
 
 # %%
 df11 = pd.concat([df9, df10], axis=1)
@@ -438,7 +444,7 @@ df11
 # If we pass the entire DataFrame, use drop_first to get that k-1 dummy variables
 pd.get_dummies(df11, columns=["key", "sex"], drop_first=True)
 
-# %%
+# %% [markdown]
 # ### Extensions Data Types
 
 # %%
@@ -620,9 +626,10 @@ pd.Categorical.from_codes([2,1,0,1,2],cate1.categories,ordered=True)
 # %%
 draws = rng.standard_normal(1000)
 bins1 = pd.qcut(draws,4,labels=[f"Q{i}" for i in range(1,5)])
+bins1
 
 # %%
-bins1
+bins1.dtype
 
 # %%
 bins1.codes[:5]
@@ -639,7 +646,7 @@ df13["quartile"]
 n = 10_000_000
 labels = pd.Series(["foo","bar","qux","gif"]*(n//4))
 lab_cate = labels.astype("category")
-lab_cate
+lab_cate.dtype
 
 # %%
 labels.memory_usage(deep=True)
