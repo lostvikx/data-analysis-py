@@ -186,14 +186,14 @@ pd.merge(df4,df5,on="key",how="outer")
 # %%
 df6 = pd.DataFrame({
   "key": list("ababca"),
-  "data": pd.Series(np.arange(6),dtype="int64")
+  "data": pd.Series(np.arange(6),dtype="Int64")
 })
 df6
 
 # %%
 df7 = pd.DataFrame({
   "key": list("aadbb"),
-  "data": pd.Series(np.arange(5),dtype="int64")
+  "data": pd.Series(np.arange(5),dtype="Int64")
 })
 df7
 
@@ -218,6 +218,164 @@ df9 = pd.DataFrame({
 })
 
 pd.merge(df8,df9,on=["key1","key2"],how="outer")
+
+# %% [markdown]
+# ### Merging on Index
+
+# %%
+left1 = pd.DataFrame({
+  "key":list("abaabc"),
+  "data": np.random.standard_normal(6).round(3)
+})
+left1
+
+# %%
+right1 = pd.DataFrame({
+  "data": np.random.standard_normal(2).round(3)
+}, index=["a", "c"])
+right1
+
+# %%
+pd.merge(left1,right1,left_on="key",right_index=True)
+
+# %%
+pd.merge(left1,right1,left_on="key",right_index=True,how="outer")
+
+# %% [markdown]
+# Note: If we want to use index of a table as the key, then use left_index or right_index parameter accordingly.
+#
+# The following is an example of how to merge two tables, one of which has its keys as a MultiIndex:
+
+# %%
+left2 = pd.DataFrame({
+  "state": ["MH", "MH", "UK", "UK", "MH"],
+  "year": [2000,2001,2000,2001,2002],
+  "data": np.random.standard_normal(5).round(3)
+})
+left2
+
+#%%
+right_index = pd.MultiIndex.from_arrays([
+  ["MH","UK","UK","UK","MH"],
+  [2000,2000,2001,2002,2001]
+])
+
+# %%
+right2 = pd.DataFrame({
+  "event1": pd.Series(np.random.standard_normal(5).round(3),index=right_index).sort_index(level=0),
+  "event2": pd.Series(np.random.standard_normal(5).round(3),index=right_index).sort_index(level=0)
+})
+right2
+
+# %%
+pd.merge(left2,right2,how="inner",left_on=["state","year"],right_index=True)
+
+# %% [markdown]
+# Merging using two indices as keys is also possible:
+
+#%%
+def random_numbers(n):
+  return (np.random.standard_normal(n) * 8).round(3)
+
+# %%
+left3 = pd.DataFrame({
+  "NY": random_numbers(4),
+  "LA": random_numbers(4)
+},index=list("abcd"))
+left3
+
+# %%
+right3 = pd.DataFrame({
+  "WA": random_numbers(3),
+  "SF": random_numbers(3)
+},index=list("abc"))
+right3
+
+# %%
+pd.merge(left3,right3,how="outer",right_index=True,left_index=True)
+
+# %% [markdown]
+# DataFrame has a `join` method, to simplify merging by index:
+
+# %%
+left3.join(right3,how="outer")
+
+# %% [markdown]
+# Note: `join` method performs a left join on the key (on=index).
+
+# %%
+left1.join(right1,on="key",lsuffix="_x",rsuffix="_y").sort_values("key")
+
+# %%
+df10 = pd.DataFrame({
+  "SE": random_numbers(2),
+  "DT": random_numbers(2)
+},index=list("bd"))
+df10
+
+# %%
+left3.join([right3,df10],how="outer")
+
+# %%
+d1 = np.arange(12).reshape(4,3)
+np.concatenate([d1,d1],axis=1)
+
+# %%
+s1 = pd.Series(np.arange(2),index=list("ab"),dtype="Int64")
+s2 = pd.Series(np.arange(3),index=list("bcd"),dtype="Int64")
+s3 = pd.Series(np.arange(2),index=list("de"),dtype="Int64")
+
+# %%
+pd.concat([s1,s2,s3],axis=0)
+
+# %%
+pd.concat([s1,s2,s3],axis=1)
+
+#%% [markdown]
+# Hierarchical index on concatenation
+
+# %%
+h_ser1 = pd.concat([s1,s2,s3],axis=0,keys=["one","two","three"])
+h_ser1
+
+# %%
+h_ser1.unstack()
+
+# %% [markdown]
+# Note: While concatenating on along `axis="column"`, the keys become the column headers.
+
+# %%
+pd.concat([s1,s2,s3],axis=1,keys=["one","two","three"])
+
+# %%
+df11 = pd.DataFrame({
+  "one": random_numbers(3),
+  "two": random_numbers(3)
+},index=list("abc"))
+
+df12 = pd.DataFrame({
+  "three": random_numbers(2),
+  "four": random_numbers(2)
+},index=list("ac"))
+
+pd.concat([df11,df12],axis=1,join="outer",keys=["lvl1","lvl2"])
+
+# %% [markdown]
+# Note: Here the `keys` arg is used to create a hierarchical column.
+#
+# We can even pass in a dict in the concat method, the dict keys will be used for keys option.
+
+# %%
+pd.concat({
+  "lvl1": df11,
+  "lvl2": df12
+},axis=1)
+
+# %%
+df13 = pd.DataFrame(random_numbers((3,4)),columns=list("abcd"))
+df14 = pd.DataFrame(random_numbers((2,3)),columns=list("bca"))
+
+pd.concat([df13,df14],axis=0,ignore_index=True)
 
 # %%
 
