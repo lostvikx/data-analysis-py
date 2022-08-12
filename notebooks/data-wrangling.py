@@ -377,5 +377,55 @@ df14 = pd.DataFrame(random_numbers((2,3)),columns=list("bca"))
 
 pd.concat([df13,df14],axis=0,ignore_index=True)
 
+# %% [markdown]
+# ### Combine Data with Overlap
+
+# %%
+ser2 = pd.Series(
+  [np.nan,2.2,1.5,8.3,4.8,np.nan],
+  index=list("cabdfe")
+)
+
+ser3 = pd.Series(
+  [6.8,np.nan,7.6,np.nan,4.1,3.9],
+  index=list("abcdef")
+)
+
+#%% [markdown]
+# Iterates over `ser2`, if `nan` value encountered, take value from `ser3`:
+
+# %%
+# This is the main logic behind the combine_first method:
+np.where(pd.isna(ser2),ser3,ser2)
+
+# %%
+ser2.combine_first(ser3)
+
+# %% [markdown]
+# Note: There is a difference in the values, because `combine_first` method first aligns both the Series by index.
+
+# %%
+df15 = pd.DataFrame({
+  "a": [1.2,np.nan,0.7],
+  "b": [np.nan,8.1,6.9],
+  "c": [2.2,4.1,2.7]
+})
+
+df16 = pd.DataFrame({
+  "a": [np.nan,1.8,0.4,3.2],
+  "b": [1.7,5.4,np.nan,9.1]
+})
+
+# %%
+df15.combine_first(df16)
+
+# %% [markdown]
+# Note: Unlike the `np.where`, `combine_first` doesn't require the lengths of the two objects to be equal.
+#
+# The output of `combine_fitst` with DataFrame objects will have the union of all the column names.
+
+# %% [markdown]
+# ### Reshaping & Pivoting
+
 # %%
 
