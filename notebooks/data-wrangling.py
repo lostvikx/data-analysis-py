@@ -426,6 +426,131 @@ df15.combine_first(df16)
 
 # %% [markdown]
 # ### Reshaping & Pivoting
+#
+# Two primary methods of pivoting the data using pandas is:
+# * `stack`: rotates or pivots from columns into rows
+# * `unstack`: pivots from rows into columns
 
 # %%
+df17 = pd.DataFrame(
+  np.random.standard_normal((2,3)).round(2),
+  index=pd.Index(["M&M","ITC"],name="stock"),
+  columns=pd.Index(["one","two","three"],name="day")
+)
+df17
 
+# %%
+# Creates a multiIndex DataFrame
+res = df17.stack()
+res
+
+# %%
+res.unstack()
+
+# %% [markdown]
+# By default the inner most level index is unstacked, same with `stack`.
+# We can `unstack` different level like this:
+
+# %%
+res.unstack(level=0)
+
+# %%
+s4 = pd.Series(np.arange(4),index=list("abcd"),dtype="Int64")
+s5 = pd.Series(np.arange(3,6),index=list("cde"),dtype="Int64")
+
+s6 = pd.concat([s4,s5],keys=["one","two"])
+s6
+
+# %%
+s6.unstack()
+
+# %%
+s6.unstack().stack(dropna=False)
+
+# %%
+df19 = pd.DataFrame({
+  "left": res,
+  "right": res * 2
+})
+df19.columns.name = "side"
+df19
+
+# %%
+df20 = df19.unstack(level="stock")
+df20
+
+# %%
+df20.stack(level="side")
+
+# %% [markdown]
+# ### Pivoting "Long" to "Wide" Format
+
+# %%
+mcdata = pd.read_csv("examples/macrodata.csv")
+mcdata = mcdata.loc[:,["year","quarter","realgdp","infl","unemp"]]
+mcdata.head()
+
+# %%
+periods = pd.PeriodIndex(
+  year=mcdata.pop("year"),
+  quarter=mcdata.pop("quarter"),
+  name="date"
+)
+periods[:5]
+
+# %% [markdown]
+# Note: Used `pop` method to remove the column data at the same time.
+
+# %%
+mcdata.index = periods.to_timestamp("D")
+mcdata.columns.name = "eco_metrics"
+mcdata.head()
+
+# %%
+mcdata.stack()
+
+# %%
+long_data = mcdata.stack().reset_index().rename(columns={0:"value"})
+long_data.head()
+
+# %% [markdown]
+# Note: In the long format, each row represents a single observation.
+
+# %%
+long_data.pivot(index="date", columns="eco_metrics", values="value").head()
+# the same as this:
+# long_data.set_index(["date","eco_metrics"]).unstack()
+
+# %%
+long_data["value2"] = np.random.standard_normal(len(long_data)).round(3)
+long_data.head()
+
+# %%
+long_data.pivot(index="date",columns="eco_metrics").head()
+
+# %% [markdown]
+# ### Pivoting "Wide" to "Long" Format
+
+# %%
+df18 = pd.DataFrame(np.arange(9).reshape((3,3)),columns=list("ABC"))
+df18["key"] = ["foo","bar","baz"]
+df18
+
+# %%
+melted = pd.melt(df18,id_vars="key")
+melted
+
+# %%
+melted.pivot(index="key",columns="variable",values="value")
+
+# %% [markdown]
+# Specify a subset of columns to use as value columns:
+
+# %%
+pd.melt(df18,id_vars="key",value_vars=["A","C"])
+
+# %% [markdown]
+# Use without an id:
+
+# %%
+pd.melt(df18,value_vars=["key","B"])
