@@ -304,7 +304,7 @@ left3.join(right3,how="outer")
 # Note: `join` method performs a left join on the key (on=index).
 
 # %%
-left1.join(right1,on="key",lsuffix="_x",rsuffix="_y").sort_values("key")
+left1.join(right1,on="key",lsuffix="_x",rsuffix="_y").sort_values("key").reset_index(drop=True)
 
 # %%
 df10 = pd.DataFrame({
@@ -314,7 +314,8 @@ df10 = pd.DataFrame({
 df10
 
 # %%
-left3.join([right3,df10],how="outer")
+cities = left3.join([right3,df10],how="outer")
+cities.fillna(cities.mean(axis=0)).round(3)
 
 # %%
 d1 = np.arange(12).reshape(4,3)
@@ -332,7 +333,7 @@ pd.concat([s1,s2,s3],axis=0)
 pd.concat([s1,s2,s3],axis=1)
 
 #%% [markdown]
-# Hierarchical index on concatenation
+# ### Hierarchical index on concatenation
 
 # %%
 h_ser1 = pd.concat([s1,s2,s3],axis=0,keys=["one","two","three"])
@@ -346,6 +347,9 @@ h_ser1.unstack()
 
 # %%
 pd.concat([s1,s2,s3],axis=1,keys=["one","two","three"])
+
+# %% [markdown]
+# We can also concatenate DataFrames:
 
 # %%
 df11 = pd.DataFrame({
@@ -425,7 +429,7 @@ df15.combine_first(df16)
 # The output of `combine_fitst` with DataFrame objects will have the union of all the column names.
 
 # %% [markdown]
-# ### Reshaping & Pivoting
+# ## Reshaping & Pivoting
 #
 # Two primary methods of pivoting the data using pandas is:
 # * `stack`: rotates or pivots from columns into rows
@@ -510,6 +514,7 @@ mcdata.head()
 mcdata.stack()
 
 # %%
+# last column name is renamed to "value"
 long_data = mcdata.stack().reset_index().rename(columns={0:"value"})
 long_data.head()
 
@@ -522,7 +527,7 @@ long_data.pivot(index="date", columns="eco_metrics", values="value").head()
 # long_data.set_index(["date","eco_metrics"]).unstack()
 
 # %%
-long_data["value2"] = np.random.standard_normal(len(long_data)).round(3)
+long_data["noise"] = np.random.standard_normal(len(long_data)).round(3)
 long_data.head()
 
 # %%
@@ -532,8 +537,12 @@ long_data.pivot(index="date",columns="eco_metrics").head()
 # ### Pivoting "Wide" to "Long" Format
 
 # %%
-df18 = pd.DataFrame(np.arange(9).reshape((3,3)),columns=list("ABC"))
-df18["key"] = ["foo","bar","baz"]
+df18 = pd.DataFrame(
+  np.arange(9).reshape((3,3)),
+  columns=list("ABC"),
+  index=pd.Index(["foo","bar","baz"],name="key")
+)
+df18 = df18.reset_index()
 df18
 
 # %%
@@ -554,3 +563,6 @@ pd.melt(df18,id_vars="key",value_vars=["A","C"])
 
 # %%
 pd.melt(df18,value_vars=["key","B"])
+
+# %%
+pd.melt(df18)
