@@ -74,3 +74,69 @@ fig.subplots_adjust(wspace=0,hspace=0)
 
 # %%
 "When someone thinks highly of you, you wonder how long it will take them to feel disappointed in you."
+
+# %%
+# defaults to subplots(1,1)
+fig, ax = plt.subplots()
+# plot y using x axis as 0 to n-1
+ax.plot(
+  np.random.standard_normal(30).cumsum(),
+  color="black",
+  linestyle="--",
+  marker="o"
+);
+
+# %%
+fig, ax = plt.subplots()
+d = np.random.standard_normal(30).cumsum()
+
+ax.plot(d,"o--",label="default"); # linear interpolation by default
+ax.plot(d,"-",label="steps-post",drawstyle="steps-post");
+
+ax.set_title("Change drawstyle")
+ax.legend();
+
+# %% [markdown]
+# **Note**: Calling the `legend` method is mandatory to create a legend, regardless of whether label option is passed while plotting.
+
+# %% [markdown]
+# ### Ticks & Labels
+#
+# Simple plot decoration methods: `xlim`, `xticks`, `xticklabels`, also the `y` counterparts.
+#
+# We can call the settter and getter methods on them:
+
+# %%
+fig, ax = plt.subplots()
+ax.plot(np.random.standard_normal(1000).cumsum(),"black");
+# X axis
+ax.set_xticks([0,250,500,750,1000]);
+ax.set_xticklabels(["Jan","Feb","Mar","Apr","May"],rotation=30);
+ax.set_xlabel("Month");
+
+# Y axis
+ax.set(
+  title="Monthly % Change in Sales",
+  ylabel="% Change"
+);
+
+# %% [markdown]
+# Note: Use the `set` method to simplify things.
+
+# %%
+fig, ax = plt.subplots()
+
+ax.plot(np.random.standard_normal(100),"-",label="one");
+ax.plot(np.random.standard_normal(100),"--",label="two");
+ax.plot(np.random.standard_normal(100),".-",label="__nolegend__");
+
+ax.legend();
+
+# %% [markdown]
+# Note: To exclude one or more plots from legend, use `label=__nolegend__` in label, to be more explicit.
+
+# %% [markdown]
+# ### Annotations & Drawings on Subplot
+
+# %%
+
