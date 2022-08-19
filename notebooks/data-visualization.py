@@ -5,6 +5,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from datetime import datetime
 
 # %%
@@ -224,6 +225,44 @@ ax.legend();
 # ## Plotting with Seaborn
 #
 # `matplotlib` can be a bit low-level, we can use a higher level plotting library called seaborn. A DataFrame can have a lot of columns, seaborn provides a lot of common plotting options.
+#
+# Pandas in-built plot method:
 
 # %%
-import seaborn as sns
+s1 = pd.Series(np.random.standard_normal(10).cumsum(),index=np.arange(0,100,10))
+s1.plot(
+  title="Randomness",
+  xlabel="days",
+  ylabel="points"
+);
+
+# %%
+df1 = pd.DataFrame(
+  np.random.standard_normal((10,4)).cumsum(axis=0),
+  columns=list("abcd"),
+  index=np.arange(0,100,10)
+)
+df1.plot(title="Multi-line Plot");
+
+# %% [markdown]
+# Note: Legend in the plot is created automatically.
+
+# %%
+df1.plot(subplots=True);
+
+# %% [markdown]
+# Note: `plot` method contains a "family" of methods for different plot types. `df.plot()` is equivalent to `df.plot.line()`.
+#
+# ### Bar Plots
+
+# %%
+from string import ascii_lowercase
+
+fig, axes = plt.subplots(2,1)
+data = pd.Series(abs(np.random.standard_normal(5)),index=list(ascii_lowercase[:5]))
+
+data.plot.bar(ax=axes[0]);
+data.plot.barh(ax=axes[1]);
+
+# %%
+
