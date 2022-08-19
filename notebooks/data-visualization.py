@@ -5,6 +5,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # %%
 # %matplotlib inline
@@ -139,4 +140,90 @@ ax.legend();
 # ### Annotations & Drawings on Subplot
 
 # %%
+fig, ax = plt.subplots()
+sp500_data = pd.read_csv("examples/spx.csv",index_col=0,parse_dates=True)
+spx = sp500_data["SPX"]
 
+spx.plot(ax=ax,color="black")
+
+crisis_data = [
+  (datetime(2007,10,11), "Peak of bull market"),
+  (datetime(2008,3,12), "Bear Stearns fails"),
+  (datetime(2008,9,15), "Lehman Brothers bankruptcy")
+]
+
+for date, label in crisis_data:
+  ax.annotate(
+    label, 
+    xy=(date, spx.loc[date]+75),
+    xytext=(date, spx.loc[date]+225),
+    arrowprops=dict(arrowstyle="->"),
+    horizontalalignment="left",
+    verticalalignment="top"
+  );
+
+ax.set(
+  xlim=["2007-1-1","2011-1-1"],
+  ylim=[600,1800],
+  title="Important dates in the 2008 financial crisis",
+  ylabel="S&P 500"
+);
+
+fig.savefig("out/2008_financial_crisis.png",dpi=400)
+
+# %%
+fig, ax = plt.subplots()
+
+rect = plt.Rectangle((0.2,0.2),0.4,0.1,alpha=0.4)
+circ = plt.Circle((0.7,0.6),0.2,alpha=0.3,color="green")
+pgon = plt.Polygon([(0.2,0.4),(0.4,0.65),(0.1,0.8)],alpha=0.4,color="yellow")
+
+ax.add_patch(rect);
+ax.add_patch(circ);
+ax.add_patch(pgon);
+
+# %% [markdown]
+# ### Save Plots to Files
+
+# %%
+fig.savefig("out/patch_shapes.svg")
+
+# %% [markdown]
+# ### Configuration
+#
+# Use the `rc` method to change the defaults on figure, plot, or colors.
+
+# %%
+plt.rc("figure", figsize=(10,10))
+
+# %%
+# Default configuration:
+plt.rcParams
+
+# %% [markdown]
+# First argument of `rc`: `figure`, `axes`, `xticks`, `yticks`, `grid`, or `legend`.
+
+# %%
+plt.rc("figure", figsize=(6,4))
+plt.rc("font",family="monospace",weight="300",size=10)
+
+fig, ax = plt.subplots()
+dt = pd.Series(np.random.standard_normal(40).cumsum())
+ax.plot(dt,"o--",label="one");
+point = 20
+ax.annotate(
+  "random point",
+  xy=(point, dt[point]),
+  xytext=(point+2,dt[point]+2),
+  arrowprops=dict(arrowstyle="->")
+)
+
+ax.legend();
+
+# %% [markdown]
+# ## Plotting with Seaborn
+#
+# `matplotlib` can be a bit low-level, we can use a higher level plotting library called seaborn. A DataFrame can have a lot of columns, seaborn provides a lot of common plotting options.
+
+# %%
+import seaborn as sns
